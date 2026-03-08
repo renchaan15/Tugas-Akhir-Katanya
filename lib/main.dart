@@ -5,13 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'screens/auth/login_screen.dart';
+import 'providers/inventory_provider.dart';
+import 'providers/transaction_provider.dart';
+import 'providers/notification_provider.dart';
+import 'providers/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -22,8 +24,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Nantinya kita tambahkan AuthProvider & FirestoreProvider di sini
-        Provider(create: (_) => ()), 
+        ChangeNotifierProvider(create: (_) => InventoryProvider()),
+        ChangeNotifierProvider(create: (_) => TransactionProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()), // Tambahkan AuthProvider di sini
+        // Nanti kita bisa tambah AuthProvider dan TransactionProvider di sini
       ],
       child: MaterialApp(
         title: 'Sistem Peminjaman Alat',
@@ -36,9 +41,7 @@ class MyApp extends StatelessWidget {
             secondary: const Color(0xFF9A8C98),
             background: const Color(0xFFF2E9E4),
           ),
-          textTheme: GoogleFonts.poppinsTextTheme(
-            Theme.of(context).textTheme,
-          ),
+          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
             fillColor: Colors.white,
@@ -46,7 +49,10 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
           ),
         ),
         home: const LoginScreen(),

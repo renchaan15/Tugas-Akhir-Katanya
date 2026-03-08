@@ -1,7 +1,11 @@
 // lib/screens/auth/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 import '../siswa/siswa_main_screen.dart';
+import '../guru/guru_main_screen.dart';
+import '../laboran/laboran_main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -134,34 +138,102 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Tombol Login
-                        ElevatedButton(
-                          onPressed: () {
-                            // Navigasi sementara untuk testing UI Siswa
-                            // Ganti 'SiswaMainScreen' dengan 'LaboranMainScreen' untuk melihat UI Laboran
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SiswaMainScreen(),
+                        // Tombol Login (Ganti bagian ini)
+                        Consumer<AuthProvider>(
+                          builder: (context, authProvider, child) {
+                            return ElevatedButton(
+                              onPressed: authProvider.isLoading
+                                  ? null
+                                  : () async {
+                                      final email = _emailController.text
+                                          .trim();
+                                      final password = _passwordController.text
+                                          .trim();
+
+                                      if (email.isEmpty || password.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Email dan kata sandi harus diisi!',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      // Panggil fungsi login
+                                      String result = await authProvider.login(
+                                        email,
+                                        password,
+                                      );
+
+                                      if (result == 'success' && mounted) {
+                                        // ROUTING OTOMATIS BERDASARKAN ROLE
+                                        Widget nextScreen;
+                                        if (authProvider.userRole == 'siswa') {
+                                          nextScreen = const SiswaMainScreen();
+                                        } else if (authProvider.userRole ==
+                                            'guru') {
+                                          nextScreen = const GuruMainScreen();
+                                        } else if (authProvider.userRole ==
+                                            'laboran') {
+                                          nextScreen =
+                                              const LaboranMainScreen();
+                                        } else {
+                                          nextScreen =
+                                              const LoginScreen(); // Fallback jika role aneh
+                                        }
+
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => nextScreen,
+                                          ),
+                                        );
+                                      } else if (mounted) {
+                                        // Tampilkan pesan error
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(result),
+                                            backgroundColor: Colors.redAccent,
+                                          ),
+                                        );
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4A4E69),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
                               ),
+                              child: authProvider.isLoading
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Masuk',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                             );
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4A4E69),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            'Masuk',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
                         ),
                       ],
                     ),

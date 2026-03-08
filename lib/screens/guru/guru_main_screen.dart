@@ -31,7 +31,7 @@ class _GuruMainScreenState extends State<GuruMainScreen> {
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           indicatorColor: const Color(0xFF4A4E69).withOpacity(0.2),
-          labelTextStyle: MaterialStateProperty.all(
+          labelTextStyle: WidgetStateProperty.all(
             const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Poppins'),
           ),
         ),

@@ -31,7 +31,7 @@ class _LaboranMainScreenState extends State<LaboranMainScreen> {
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           indicatorColor: const Color(0xFF9A8C98).withOpacity(0.3),
-          labelTextStyle: MaterialStateProperty.all(
+          labelTextStyle: WidgetStateProperty.all(
             const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Poppins'),
           ),
         ),
